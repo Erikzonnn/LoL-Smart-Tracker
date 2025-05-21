@@ -20,37 +20,35 @@
 
 ## 🔭 Acerca del Proyecto
 
-**LoL Smart Tracker** es una aplicación web diseñada para ayudar a los jugadores de League of Legends a visualizar su rendimiento reciente y, lo más importante, recibir recomendaciones personalizadas y análisis inteligentes generados por IA para mejorar su desempeño en el juego. [cite: 20]
+**LoL Smart Tracker** es una aplicación web diseñada para ayudar a los jugadores de League of Legends a visualizar su rendimiento reciente y, lo más importante, recibir recomendaciones personalizadas y análisis inteligentes generados por IA para mejorar su desempeño en el juego.
 
-A diferencia de otros trackers que se centran en mostrar estadísticas simples[cite: 24], LoL Smart Tracker busca:
-* Interpretar tus estadísticas con lógica e inteligencia. [cite: 25]
-* Detectar patrones en tu juego, como campeones con bajo rendimiento, fallos comunes, o baja participación en objetivos. [cite: 21, 26]
-* Sugerir cambios adaptativos para mejorar tu estrategia general. [cite: 27]
+A diferencia de otros trackers que se centran en mostrar estadísticas simples, LoL Smart Tracker busca:
+* Interpretar tus estadísticas con lógica e inteligencia.
+* Detectar patrones en tu juego, como campeones con bajo rendimiento, fallos comunes, o baja participación en objetivos.
+* Sugerir cambios adaptativos para mejorar tu estrategia general.
 
-El sistema obtiene automáticamente las últimas partidas del usuario (actualmente configurado para analizar hasta 50, mostrando 20) a través de la API oficial de Riot Games y aplica diferentes técnicas de IA, desde análisis estadísticos avanzados hasta modelos de Machine Learning, para generar sugerencias y perspectivas únicas. [cite: 21]
+El sistema obtiene automáticamente las últimas partidas del usuario (actualmente configurado para analizar hasta 50, mostrando 20) a través de la API oficial de Riot Games y aplica diferentes técnicas de IA, desde análisis estadísticos avanzados hasta modelos de Machine Learning, para generar sugerencias y perspectivas únicas.
 
-Este proyecto es una evolución en las herramientas de análisis de LoL, buscando ser una herramienta proactiva que realmente ayude a los jugadores a mejorar, ofreciendo información útil más allá de simples números. [cite: 34, 35]
-
-*(Este proyecto fue originalmente mi Trabajo Final de Grado, y ha sido expandido y mejorado continuamente.)*
+Este proyecto es una evolución en las herramientas de análisis de LoL, buscando ser una herramienta proactiva que realmente ayude a los jugadores a mejorar, ofreciendo información útil más allá de simples números.
 
 ## ✨ Características
 
-* **Visualización de Historial de Partidas:** Muestra un resumen de tus últimas partidas (hasta 20 en la interfaz), incluyendo KDA, CS, oro, daño, objetos, hechizos, modo de juego y más. [cite: 22]
+* **Visualización de Historial de Partidas:** Muestra un resumen de tus últimas partidas (hasta 20 en la interfaz), incluyendo KDA, CS, oro, daño, objetos, hechizos, modo de juego y más.
 * **Análisis del Invocador:** Presenta información de tu perfil, incluyendo nivel y rango en Solo/Duo con su emblema.
 * **Recomendaciones Generales del Analista (IA - Nivel 1):**
     * Análisis de winrate general y rachas de derrotas.
-    * Evaluación del rendimiento con campeones específicos (KDA y winrate). [cite: 23]
+    * Evaluación del rendimiento con campeones específicos (KDA y winrate).
     * Análisis de CS/minuto según el rol.
     * Evaluación de la participación en asesinatos (KP%).
     * Análisis de la puntuación de visión por minuto.
     * Identificación de métricas clave que se correlacionan con tus victorias/derrotas para campeones específicos (Análisis Estadístico Avanzado).
 * **Perspectivas Clave por Campeón (IA - Árbol de Decisión):**
-    * Un modelo de Machine Learning simple analiza tus partidas con tus campeones más jugados para identificar qué estadística personal parece ser el factor más influyente para tus victorias. [cite: 30]
+    * Un modelo de Machine Learning simple analiza tus partidas con tus campeones más jugados para identificar qué estadística personal parece ser el factor más influyente para tus victorias.
 * **Análisis de Estilos de Juego (IA - Clustering K-Means):**
-    * Un modelo de clustering agrupa tus partidas recientes en diferentes estilos de juego, intentando asignarles nombres de arquetipo y ayudándote a entender tus tendencias. [cite: 32]
+    * Un modelo de clustering agrupa tus partidas recientes en diferentes estilos de juego, intentando asignarles nombres de arquetipo y ayudándote a entender tus tendencias.
 * **Predicción de Composición de Equipo (IA - RandomForest):**
     * Un modelo entrenado con datos de composiciones de equipo (recopilados en la BD local) ofrece una estimación de la probabilidad de victoria para el equipo azul en cada partida de tu historial.
-    * Muestra los campeones que el modelo global considera más influyentes según los datos con los que fue entrenado. [cite: 31]
+    * Muestra los campeones que el modelo global considera más influyentes según los datos con los que fue entrenado.
 * **Búsqueda Integrada:** Permite buscar cualquier invocador por su Riot ID#TAG directamente desde la página de resultados o la de inicio.
 * **Almacenamiento de Datos:** Guarda los datos de las partidas procesadas en una base de datos SQLite local para permitir análisis más profundos y el reentrenamiento de modelos de ML a medida que se recopilan más datos.
 * **Optimización con Caché:** Utiliza Flask-Caching (`FileSystemCache`) para reducir las llamadas a la API de Riot y mejorar los tiempos de carga en búsquedas repetidas.
