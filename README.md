@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./app/static/img/logoLolTracker.png" alt="LoL Smart Tracker Logo" width="150"/>
+  <img src="app/static/img/logoLolTrackerNoBack.png" alt="LoL Smart Tracker Logo" width="150"/>
   <h1>LoL Smart Tracker</h1>
   <p>
     <strong>Analiza tus partidas de League of Legends y recibe recomendaciones de IA para mejorar tu juego.</strong>
