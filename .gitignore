@@ -11,14 +11,6 @@ instance/lol_smart_tracker.db
 # Por ejemplo, si está en la raíz y se llama 'flask_cache':
 # /flask_cache/
 
-# Archivos de modelos de ML y características generados por scripts
-# Es mejor regenerarlos a partir de los datos y el código.
-# Si decides versionar modelos pequeños y estables, puedes quitar estas líneas.
-*.joblib
-*.pkl
-top_champion_influencers.json
-lol_match_compositions_dataset.csv
-
 # Archivos compilados de Python y cachés de Python
 __pycache__/
 *.py[cod]

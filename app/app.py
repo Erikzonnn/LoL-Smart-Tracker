@@ -14,54 +14,49 @@ def create_app():
     """
     Factory function para crear y configurar la aplicación Flask.
     """
-    app = Flask(__name__, instance_relative_config=True)
-    
+    flask_app_instance = Flask(__name__, instance_relative_config=True)
+
+    # --- Configuración de la Aplicación ---
     # Configuración de SQLAlchemy
+    # Construir la ruta a la carpeta 'instance' en la raíz del proyecto
+
     project_root = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     instance_folder_path = os.path.join(project_root, 'instance')
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
-                                           'sqlite:///' + os.path.join(instance_folder_path, 'lol_smart_tracker.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    print(f"DEBUG (Flask App): Usando BD en: {app.config['SQLALCHEMY_DATABASE_URI']}") # DEBUG
+    default_db_path = 'sqlite:///' + os.path.join(instance_folder_path, 'lol_smart_tracker.db')
+    flask_app_instance.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or default_db_path
+    flask_app_instance.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # --- Creación de Directorios Necesarios ---
+    # --- Creación de Directorios Necesarios (como 'instance' para SQLite y 'flask_cache' para FileSystemCache) ---
     try:
         # Crear la carpeta 'instance' en la raíz del proyecto si no existe
         if not os.path.exists(instance_folder_path):
             os.makedirs(instance_folder_path)
-            app.logger.info(f"Directorio de instancia creado en: {instance_folder_path}")
+        
+        cache_dir_from_config = cache.config.get("CACHE_DIR") 
+        if cache_dir_from_config:
 
-        # Si usas FileSystemCache y CACHE_DIR está configurado a 'instance/flask_cache'
-        # Flask-Caching usualmente crea el directorio si no existe, pero esto es una doble verificación.
-        cache_dir_from_config = cache.config.get("CACHE_DIR") # Obtener de la instancia de Cache
-        if cache_dir_from_config and cache_dir_from_config.startswith('instance') and not os.path.isabs(cache_dir_from_config):
-            # Construir path absoluto para CACHE_DIR si es relativo a 'instance'
-            abs_cache_dir = os.path.join(project_root, cache_dir_from_config)
-            if not os.path.exists(abs_cache_dir):
-                os.makedirs(abs_cache_dir)
-                app.logger.info(f"Directorio de caché creado en: {abs_cache_dir}")
-
+            if cache_dir_from_config.startswith('instance') and not os.path.isabs(cache_dir_from_config):
+                abs_cache_dir = os.path.join(project_root, cache_dir_from_config)
+                if not os.path.exists(abs_cache_dir):
+                    os.makedirs(abs_cache_dir)
     except OSError as e:
-        app.logger.warning(f"No se pudo crear el directorio de instancia o caché: {e}")
         pass 
 
     # --- Inicialización de Extensiones ---
-    db.init_app(app)    # Inicializar SQLAlchemy con la aplicación
-    cache.init_app(app) 
+    db.init_app(flask_app_instance)
+    cache.init_app(flask_app_instance)
 
     # --- Registrar Blueprints ---
-    app.register_blueprint(routes)
+    flask_app_instance.register_blueprint(routes)
 
     # --- Crear Tablas de la Base de Datos (si no existen) ---
-    with app.app_context():
-        print("DEBUG (Flask App): Intentando crear tablas de la base de datos (db.create_all())...")
+    with flask_app_instance.app_context():
         db.create_all()
-        print("DEBUG (Flask App): Tablas de la base de datos verificadas/creadas.")
+    return flask_app_instance
 
-    return app
+application = create_app()
 
+# Este bloque es para ejecutar la aplicación directamente con 'python -m app.app' para desarrollo local.
 if __name__ == "__main__":
-    current_app = create_app()
-    current_app.run(host='0.0.0.0', port=5000, debug=True)
+    application.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=os.environ.get("FLASK_DEBUG", "1") == "1")

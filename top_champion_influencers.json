@@ -1,0 +1,42 @@
+[
+    {
+        "feature": "Ashe",
+        "importance": 0.048634980608532816
+    },
+    {
+        "feature": "Karma",
+        "importance": 0.040688828590476234
+    },
+    {
+        "feature": "Corki",
+        "importance": 0.03789140028707828
+    },
+    {
+        "feature": "Ahri",
+        "importance": 0.03399790479006577
+    },
+    {
+        "feature": "Caitlyn",
+        "importance": 0.03240019039944106
+    },
+    {
+        "feature": "Tristana",
+        "importance": 0.028458971920904255
+    },
+    {
+        "feature": "Jinx",
+        "importance": 0.027025302639066585
+    },
+    {
+        "feature": "Zed",
+        "importance": 0.02660288208546039
+    },
+    {
+        "feature": "MissFortune",
+        "importance": 0.01990862281295497
+    },
+    {
+        "feature": "Darius",
+        "importance": 0.01871349906231212
+    }
+]
