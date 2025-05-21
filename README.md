@@ -10,7 +10,6 @@
     <a href="#-tecnologías-utilizadas">Tecnologías</a> •
     <a href="#-cómo-empezar">Cómo Empezar</a> •
     <a href="#-futuras-mejoras">Futuras Mejoras</a> •
-    <a href="#-contacto">Contacto</a>
   </p>
   <br />
   Hola 👋, Soy Erik Santana Montelongo, Backend Developer y creador de este proyecto.
