@@ -1,23 +1,4 @@
-&lt;h1 align="center">LoL Smart Tracker&lt;/h1>
-&lt;p align="center">
-&lt;img src="app/static/img/logoLolTracker.png" alt="LoL Smart Tracker Logo" width="150"/>
-&lt;/p>
-&lt;p align="center">
-&lt;strong>Analiza tus partidas de League of Legends y recibe recomendaciones de IA para mejorar tu juego.&lt;/strong>
-&lt;br />
-&lt;a href="#%EF%B8%8F-acerca-del-proyecto">Acerca del Proyecto&lt;/a> •
-&lt;a href="#-características">Características&lt;/a> •
-&lt;a href="#-tecnologías-utilizadas">Tecnologías&lt;/a> •
-&lt;a href="#-cómo-empezar">Cómo Empezar&lt;/a> •
-&lt;a href="#-futuras-mejoras">Futuras Mejoras&lt;/a> •
-&lt;a href="#-contacto">Contacto&lt;/a>
-&lt;/p>
-
-&lt;div align="center">
-
 Hola 👋, Soy Erik Santana Montelongo, Backend Developer y creador de este proyecto.
-
-&lt;/div>
 
 🔭 Acerca del Proyecto
 LoL Smart Tracker es una aplicación web diseñada para ayudar a los jugadores de League of Legends a visualizar su rendimiento reciente y, lo más importante, recibir recomendaciones personalizadas y análisis inteligentes generados por IA para mejorar su desempeño en el juego. 
