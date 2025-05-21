@@ -58,8 +58,8 @@ Este proyecto es una evolución en las herramientas de análisis de LoL, buscand
 Este proyecto se ha construido utilizando las siguientes tecnologías principales:
 
 * **Backend:**
-    * ![Python](https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg) Python
-    * ![Flask](https://raw.githubusercontent.com/devicons/devicon/master/icons/flask/flask-original.svg) Flask
+    * Python
+    * Flask
     * Flask-SQLAlchemy
     * Flask-Caching
 * **Frontend:**
@@ -67,11 +67,11 @@ Este proyecto se ha construido utilizando las siguientes tecnologías principale
     * CSS3 (con [Tailwind CSS](https://tailwindcss.com/) y [Bootstrap 5](https://getbootstrap.com/))
     * JavaScript (mínimo)
 * **Machine Learning:**
-    * ![Pandas](https://raw.githubusercontent.com/devicons/devicon/master/icons/pandas/pandas-original.svg) Pandas
-    * ![NumPy](https://raw.githubusercontent.com/devicons/devicon/master/icons/numpy/numpy-original.svg) NumPy
-    * ![Scikit-learn](https://raw.githubusercontent.com/devicons/devicon/master/icons/scikit-learn/scikit-learn-original.svg) Scikit-learn
+    * Pandas
+    * NumPy
+    * Scikit-learn
 * **Base de Datos:**
-    * ![SQLite](https://raw.githubusercontent.com/devicons/devicon/master/icons/sqlite/sqlite-original.svg) SQLite
+    * SQLite
 * **API:**
     * Riot Games API
 * **Otros:**
