@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ summoner_name_display if summoner_name_display else "LoL Smart Tracker" }} - LoL Smart Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/summoner_page_styles.css') }}">
+</head>
+<body class="p-4 md:p-6"> <div class="container-main space-y-8">
+
+<header class="flex flex-wrap justify-between items-center mb-6 pb-4 border-b border-gray-200">
+            <a href="{{ url_for('routes.index') }}" class="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
+                <img src="{{ url_for('static', filename='img/logoLolTrackerNoBack.png') }}" alt="LoL Smart Tracker Logo" class="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12"> {# Ajusta tamaño con h-X w-X #}
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-violet-700 hover:text-violet-800 self-center">
+                    LoL Smart Tracker
+                </h1>
+            </a>
+            <form method="POST" action="{{ url_for('routes.index') }}" class="flex items-center space-x-2 mt-3 sm:mt-0 w-full sm:w-auto">
+                <input type="text" name="riot_id" 
+                       class="form-input new-search-input px-3 py-1.5 text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 flex-grow sm:flex-grow-0 w-auto sm:w-48 md:w-64" 
+                       placeholder="Otro Invocador#TAG" required>
+                <button type="submit" 
+                        class="new-search-button px-3 sm:px-4 py-1.5 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition ease-in-out duration-150">
+                    Buscar
+                </button>
+            </form>
+        </header>
+        
+        <div class="summoner-header">
+            {% if profile_icon_id %}
+                <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/profileicon/{{ profile_icon_id }}.png" alt="Icono de perfil de {{ summoner_name_display }}" class="profile-icon">
+            {% else %}
+                <div class="profile-icon bg-gray-200 flex items-center justify-center text-gray-400 text-2xl">?</div>
+            {% endif %}
+            <div class="summoner-main-info">
+                <h1 class="name" style="color: #6f42c1;">{{ summoner_name_display }}</h1>
+                {% if summoner_level is not none %}
+                <p class="details">Nivel de Invocador: {{ summoner_level }}</p>
+                {% endif %}
+                {% if solo_rank_info %}
+                    <div class="rank-info details">
+                        {% if solo_rank_info.tier and solo_rank_info.tier != "UNRANKED" %}
+                            <img src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank{{ solo_rank_info.tier|lower }}.png" 
+                                 alt="Emblema de {{ solo_rank_info.tier }}" class="rank-emblem"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="rank-emblem bg-gray-200 items-center justify-center text-gray-500" style="display:none; width:50px; height:50px;">?</div>
+                            <span class="rank-text">
+                                <strong>{{ solo_rank_info.tier|replace('_', ' ')|capitalize }} {{ solo_rank_info.rank }}</strong>
+                                <span class="lp">({{ solo_rank_info.lp }} LP)</span><br>
+                                <span class="winloss">{{ solo_rank_info.wins }}V / {{ solo_rank_info.losses }}D</span>
+                            </span>
+                        {% else %}
+                            <img src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rankunranked.png" 
+                                 alt="Unranked" class="rank-emblem opacity-75"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                             <div class="rank-emblem bg-gray-200 items-center justify-center text-gray-500" style="display:none; width:50px; height:50px;">?</div>
+                            <span class="rank-text"><strong>Unranked</strong> en Solo/Duo</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md" role="alert">
+                <p class="font-bold">Error al Cargar Datos</p>
+                <p>{{ error }}</p>
+            </div>
+        {% else %}
+
+        <section>
+            <h2 class="section-title">💡 Consejos Generales del Analista</h2>
+            {% if general_recommendations %}
+            <ul class="list-disc ml-5 space-y-1 text-sm">
+                {% for rec in general_recommendations %}
+                    {% if rec.startswith("[CRITICAL]") %}
+                        <li class="text-red-600"><strong class="font-semibold text-red-700">❗ Crítico:</strong> {{ rec.replace("[CRITICAL]", "").strip() }}</li>
+                    {% elif rec.startswith("[SUGGESTION]") %}
+                        <li class="text-amber-600"><strong class="font-semibold text-amber-700">💡 Sugerencia:</strong> {{ rec.replace("[SUGGESTION]", "").strip() }}</li>
+                    {% elif rec.startswith("[POSITIVE]") %}
+                        <li class="text-green-600"><strong class="font-semibold text-green-700">✅ Positivo:</strong> {{ rec.replace("[POSITIVE]", "").strip() }}</li>
+                    {% elif rec.startswith("[INFO]") %}
+                        <li class="text-blue-600"><strong class="font-semibold text-blue-700">ℹ️ Info:</strong> {{ rec.replace("[INFO]", "").strip() | safe }}</li>
+                    {% else %}
+                        <li class="text-gray-700">{{ rec }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="ml-5 text-sm text-gray-600">No hay consejos generales en este momento. ¡Parece que todo va bien o necesitamos más partidas!</p>
+            {% endif %}
+        </section>
+
+        <section>
+            <h2 class="section-title">🏆 Perspectivas Clave por Campeón (IA)</h2>
+            {% if ml_decision_tree_insights %}
+            <ul class="list-disc ml-5 space-y-1 text-sm text-gray-700">
+                {% for insight in ml_decision_tree_insights %}
+                    {% if insight.startswith("[INFO]") %}
+                        <li class="text-blue-600"><strong class="font-semibold text-blue-700">ℹ️ Modelo IA:</strong> {{ insight.replace("[INFO]", "").strip() | safe }}</li>
+                    {% else %}
+                        <li>{{ insight | safe }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="ml-5 text-sm text-gray-600">No hay suficientes datos con campeones específicos para un análisis de factores clave por campeón en este momento (se necesitan ~{{ MIN_GAMES_FOR_CHAMP_ML_DISPLAY | default(10) }} partidas con un campeón en el historial analizado).</p>
+            {% endif %}
+        </section>
+
+        <section>
+            <h2 class="section-title">🎨 Análisis de Estilos de Juego (IA)</h2>
+            {% if playstyle_insights %}
+            <ul class="list-disc ml-5 space-y-1 text-sm text-gray-700">
+                {% for playstyle_insight in playstyle_insights %}
+                    {% if playstyle_insight.startswith("[INFO]") %}
+                        <li><strong class="font-semibold text-blue-700">ℹ️ </strong> {{ playstyle_insight.replace("[INFO]", "").strip() | safe }}</li>
+                    {% else %}
+                         <li>{{ playstyle_insight | safe }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="ml-5 text-sm text-gray-600">No se pudo realizar un análisis de estilos de juego con los datos actuales (se necesitan ~{{ MIN_GAMES_FOR_CLUSTERING_ML_DISPLAY | default(15) }} partidas analizables).</p>
+            {% endif %}
+        </section>
+        
+        {% if top_champion_influencers %}
+        <section>
+            <h2 class="section-title">✨ Campeones Más Influyentes (Modelo de Composición)</h2>
+            <p class="text-xs text-gray-600 mb-3">
+                Estos son los campeones que nuestro modelo de IA, entrenado con los datos de partidas disponibles,
+                considera que tienen un impacto general en la predicción del resultado. La "importancia" indica cuánto usa el modelo a ese campeón para tomar decisiones.
+                (Este análisis es general y se basa en todos los datos recopilados hasta ahora por la aplicación).
+            </p>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-100 border-b border-gray-300">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-semibold text-gray-700">#</th>
+                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Campeón (Característica)</th>
+                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Puntuación de Importancia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for champ_info in top_champion_influencers %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700">{{ loop.index }}</td>
+                            <td class="px-4 py-2 text-gray-800 font-medium">{{ champ_info.feature }}</td>
+                            <td class="px-4 py-2 text-gray-700">{{ "%.4f"|format(champ_info.importance) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+
+
+        <section>
+            <h2 class="section-title">🎮 Últimas Partidas (Mostrando {{ [stats|length, 20]|min }} más recientes)</h2>
+            {% if api_warning %}
+                <p class="text-xs text-orange-600 bg-orange-100 p-2 rounded mb-4">{{ api_warning }}</p>
+            {% endif %}
+            {% if stats %}
+            <div class="space-y-6">
+                {% for match in stats[:20] %} <div class="match-card space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/champion/{{ match.champion }}.png" alt="{{ match.champion }}" class="w-20 h-20 rounded-md border">
+                            <div>
+                                <h3 class="text-xl font-semibold">
+                                    {{ match.champion }} 
+                                    <span class="text-sm font-normal text-gray-500">({{ match.role if match.role else 'N/A' }})</span>
+                                    {% if match.game_mode_name %}
+                                        <span class="text-xs font-medium text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full ml-2 align-middle">{{ match.game_mode_name }}</span>
+                                    {% endif %}
+                                </h3>
+                                <p class="text-lg font-bold {{ 'text-green-500' if match.win else 'text-red-500' }}">
+                                    {{ 'Victoria' if match.win else 'Derrota' }}
+                                </p>
+                                <p class="text-xs text-gray-600">
+                                    KDA: <span class="font-medium">{{ match.kills }}/{{ match.deaths }}/{{ match.assists }}</span> (<span class="font-semibold">{{ match.kda_ratio }}</span> Ratio) &nbsp;|&nbsp; 
+                                    CS: <span class="font-medium">{{ match.cs }} ({{ match.cs_per_min }} CS/min)</span> &nbsp;|&nbsp; 
+                                    KP: <span class="font-medium">{{ match.kp_percentage }}%</span> <br>
+                                    Daño: <span class="font-medium">{{ match.damage_to_champs|round|int }} ({{ match.damage_per_min }} Dmg/min)</span> &nbsp;|&nbsp; 
+                                    Oro: <span class="font-medium">{{ match.gold|round|int }} ({{ match.gold_per_min }} Oro/min)</span> <br>
+                                    Visión: <span class="font-medium">{{ match.vision_score }} ({{ match.vision_score_per_min }} VS/min)</span> &nbsp;|&nbsp;
+                                    Duración: <span class="font-medium">{{ match.duration }} min</span>
+                                </p>
+                                {% if match.composition_prediction_insight %}
+                                <p class="text-xs text-purple-700 mt-1 italic">
+                                    {{ match.composition_prediction_insight }}
+                                    <span class="text-gray-600 not-italic">(Resultado Real Equipo Azul: 
+                                        {% if match.blue_team_won %}Victoria{% else %}Derrota{% endif %})
+                                    </span>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3 text-sm border-t border-gray-200 pt-3 mt-3">
+                            <div>
+                                <span class="text-gray-500 font-semibold block mb-1">Hechizos:</span>
+                                <div class="flex space-x-1">
+                                {% for spell_key in match.spells %}
+                                    {% if spell_key and not spell_key.startswith('UnknownSpellID') %}
+                                    <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/spell/{{ spell_key }}.png" alt="{{ spell_key }}" class="w-9 h-9 rounded border" title="{{ spell_key|replace('Summoner','') }}">
+                                    {% else %}
+                                    <div class="w-9 h-9 rounded border bg-gray-200 flex items-center justify-center text-xs text-gray-500" title="{{ spell_key }}">?</div>
+                                    {% endif %}
+                                {% endfor %}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 font-semibold block mb-1">Runas (Estilos):</span>
+                                <div class="flex space-x-1 mt-1">
+                                {% if match.runes.primary_icon_file and match.runes.primary_icon_file != "UnknownRuneStyle.png" %}
+                                    <img src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/styles/{{ match.runes.primary_icon_file }}" 
+                                         alt="{{ match.runes.primary_icon_file }}" class="rune-icon" title="{{ match.runes.primary_icon_file|replace('_', ' ')|replace('.png', '')|capitalize }}" 
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="rune-slot-empty" style="display:none;" title="Runa primaria: {{match.runes.primary_icon_file}}">?</div>
+                                {% else %}
+                                    <div class="rune-slot-empty" title="Runa primaria no disponible">?</div>
+                                {% endif %}
+                                {% if match.runes.secondary_icon_file and match.runes.secondary_icon_file != "UnknownRuneStyle.png" %}
+                                    <img src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/styles/{{ match.runes.secondary_icon_file }}" 
+                                         alt="{{ match.runes.secondary_icon_file }}" class="rune-icon" title="{{ match.runes.secondary_icon_file|replace('_', ' ')|replace('.png', '')|capitalize }}" 
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="rune-slot-empty" style="display:none;" title="Runa secundaria: {{match.runes.secondary_icon_file}}">?</div>
+                                {% else %}
+                                    <div class="rune-slot-empty" title="Runa secundaria no disponible">?</div>
+                                {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 font-semibold block mb-1">Ítems:</span>
+                                <div class="flex flex-wrap gap-1">
+                                {% for item_id_val in match.item_ids %}
+                                    {% if item_id_val != 0 %}
+                                        <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/item/{{ item_id_val }}.png" class="item-icon" alt="Ítem {{ item_id_val }}" title="Ítem {{ item_id_val }}">
+                                    {% else %}
+                                        <div class="item-slot-empty"></div>
+                                    {% endif %}
+                                {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if match.team_members_display and match.team_members_display|length > 0 %}
+                        <div class="mt-4 border-t border-gray-200 pt-3">
+                            <h4 class="text-base font-semibold mb-3 text-center">Resumen de Equipos</h4>
+                            <div class="team-summary-grid">
+                                <div>
+                                    <h5 class="team-header blue-team {% if match.blue_team_won %}text-green-700{% else %}text-red-700{% endif %}">
+                                        Equipo Azul {% if match.blue_team_won %}<span class="font-normal text-xs">(Victoria)</span>{% else %}<span class="font-normal text-xs">(Derrota)</span>{% endif %}
+                                    </h5>
+                                    <div class="space-y-0.5">
+                                        {% for p_info in match.team_members_display %}{% if p_info.teamId == 100 %}
+                                        <div class="participant-row">
+                                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/champion/{{ p_info.championName }}.png" alt="{{ p_info.championName }}" class="participant-champ-icon" title="{{ p_info.championName }}">
+                                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/spell/{{ p_info.spell1_key }}.png" alt="S1" class="participant-spell-icon" title="{{ p_info.spell1_key|replace('Summoner','') }}">
+                                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/spell/{{ p_info.spell2_key }}.png" alt="S2" class="participant-spell-icon" title="{{ p_info.spell2_key|replace('Summoner','') }}">
+                                            <span class="participant-name" title="{{ p_info.summonerName }}">{{ p_info.summonerName }}</span>
+                                        </div>
+                                        {% endif %}{% endfor %}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5 class="team-header red-team {% if match.red_team_won %}text-green-700{% else %}text-red-700{% endif %}">
+                                        Equipo Rojo {% if match.red_team_won %}<span class="font-normal text-xs">(Victoria)</span>{% else %}<span class="font-normal text-xs">(Derrota)</span>{% endif %}
+                                    </h5>
+                                    <div class="space-y-0.5">
+                                        {% for p_info in match.team_members_display %}{% if p_info.teamId == 200 %}
+                                        <div class="participant-row">
+                                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/champion/{{ p_info.championName }}.png" alt="{{ p_info.championName }}" class="participant-champ-icon" title="{{ p_info.championName }}">
+                                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/spell/{{ p_info.spell1_key }}.png" alt="S1" class="participant-spell-icon" title="{{ p_info.spell1_key|replace('Summoner','') }}">
+                                            <img src="https://ddragon.leagueoflegends.com/cdn/{{ version }}/img/spell/{{ p_info.spell2_key }}.png" alt="S2" class="participant-spell-icon" title="{{ p_info.spell2_key|replace('Summoner','') }}">
+                                            <span class="participant-name" title="{{ p_info.summonerName }}">{{ p_info.summonerName }}</span>
+                                        </div>
+                                        {% endif %}{% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %} 
+                    </div> 
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center text-gray-500 py-10">No se encontraron partidas recientes o no se pudieron procesar los datos.</p>
+            {% endif %} 
+        </section>
+        {% endif %} 
+    </div>
+</body>
+</html>
