@@ -1,11 +1,10 @@
 # app/riot_api.py
 import requests
 import os
-import time # Para logs de caché (opcional, aunque los prints ya sirven para depurar)
-from .extensions import cache # Importar la instancia de caché desde extensions.py
+import time
+from .extensions import cache
 
-# Cargar la clave de API de forma segura desde variables de entorno
-RIOT_API_KEY = ("RGAPI-54e5fe5d-590e-4a6b-ac48-bbba4e9ce3e3") 
+RIOT_API_KEY = ("RGAPI-91997357-91e3-4ced-a418-bc794a85ebc2") 
 if not RIOT_API_KEY:
     raise ValueError("La variable de entorno RIOT_API_KEY no está configurada. Por favor, configúrala.")
 
@@ -54,7 +53,6 @@ def _make_cache_key_match_detail(*args, **kwargs):
     return f"matchdetail__{match_id}"
 
 # --- Funciones de API cacheadas usando make_cache_key ---
-
 @cache.cached(timeout=900, make_cache_key=_make_cache_key_summoner_info) # Cache por 15 minutos
 def get_summoner_info(name: str, tag: str):
     """Obtiene la información de la cuenta (incluyendo PUUID) por Riot ID."""
@@ -161,7 +159,6 @@ def _get_single_match_detail_from_api(match_id: str):
         print(f"Error al decodificar JSON de detalles de la partida {match_id}: {json_err}")
         return None
 
-# get_match_history no se decora directamente, ya que llama a las funciones auxiliares que sí están cacheadas.
 def get_match_history(puuid: str, count: int = 10):
     """Obtiene el historial de partidas, usando funciones cacheadas para IDs y detalles."""
     if not puuid:
@@ -195,6 +192,6 @@ def get_match_history(puuid: str, count: int = 10):
         else:
             print(f"Advertencia: No se pudieron obtener/cachear los detalles para la partida {id_partida}.")
         
-        time.sleep(0.15) # Retraso para ser más gentil con la API al obtener múltiples detalles
+        time.sleep(0.15)
             
     return match_data_list

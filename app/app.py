@@ -1,9 +1,7 @@
-# app/app.py
 import os
 from flask import Flask
 from dotenv import load_dotenv
 
-# Cargar variables de entorno del archivo .env al inicio de la aplicación
 load_dotenv() 
 
 from .routes import routes
@@ -17,9 +15,6 @@ def create_app():
     flask_app_instance = Flask(__name__, instance_relative_config=True)
 
     # --- Configuración de la Aplicación ---
-    # Configuración de SQLAlchemy
-    # Construir la ruta a la carpeta 'instance' en la raíz del proyecto
-
     project_root = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     instance_folder_path = os.path.join(project_root, 'instance')
 
@@ -27,9 +22,9 @@ def create_app():
     flask_app_instance.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or default_db_path
     flask_app_instance.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # --- Creación de Directorios Necesarios (como 'instance' para SQLite y 'flask_cache' para FileSystemCache) ---
+    # --- Creación de Directorios Necesarios ---
     try:
-        # Crear la carpeta 'instance' en la raíz del proyecto si no existe
+        # Crear la carpeta 'instance' si no existe
         if not os.path.exists(instance_folder_path):
             os.makedirs(instance_folder_path)
         
@@ -57,6 +52,6 @@ def create_app():
 
 application = create_app()
 
-# Este bloque es para ejecutar la aplicación directamente con 'python -m app.app' para desarrollo local.
+# 'python -m app.app'
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=os.environ.get("FLASK_DEBUG", "1") == "1")

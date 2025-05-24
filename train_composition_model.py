@@ -1,8 +1,7 @@
-# train_composition_model.py
 import sqlite3
 import pandas as pd
 import os
-import json # Para guardar los top features
+import json
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
@@ -10,16 +9,14 @@ import joblib
 import numpy as np
 import traceback
 
-# Configuración de Rutas (ajusta si es necesario)
-# Asumimos que este script se ejecuta desde la raíz del proyecto,
-# y la carpeta 'instance' está en la raíz.
+# Configuración de Rutas
 INSTANCE_FOLDER = 'instance'
 DB_FILENAME = 'lol_smart_tracker.db'
 DB_PATH = os.path.join(INSTANCE_FOLDER, DB_FILENAME)
 
 MODEL_FILENAME = 'team_composition_predictor.joblib'
-FEATURES_FILENAME = 'team_composition_features.joblib' # Para guardar la lista ordenada de campeones
-TOP_FEATURES_FILENAME = 'top_champion_influencers.json' # Para guardar los N campeones más influyentes
+FEATURES_FILENAME = 'team_composition_features.joblib'
+TOP_FEATURES_FILENAME = 'top_champion_influencers.json'
 
 def fetch_and_prepare_data():
     """
@@ -33,7 +30,6 @@ def fetch_and_prepare_data():
     conn = None
     try:
         conn = sqlite3.connect(DB_PATH)
-        # Query para obtener los datos necesarios
         query = """
         SELECT 
             pp.match_id,
@@ -78,7 +74,6 @@ def fetch_and_prepare_data():
         processed_df = pd.DataFrame(matches_data)
         print(f"Dataset de composiciones procesado con {len(processed_df)} partidas.")
         
-        # Umbral mínimo de partidas para intentar entrenar
         if len(processed_df) < 20 : 
              print("Dataset demasiado pequeño para un entrenamiento significativo. Se necesitan al menos 20 partidas.")
              return None, None, None
@@ -113,9 +108,7 @@ def fetch_and_prepare_data():
         
         print(f"\nDimensiones de X_features: {X_features.shape}")
         print(f"Dimensiones de y_target: {y_target.shape}")
-        # print("\nPrimeras 5 filas de X_features transformadas:")
-        # print(X_features.head())
-        
+
         return X_features, y_target, sorted_unique_champions
 
     except sqlite3.Error as e:
@@ -144,9 +137,8 @@ def train_model(X, y):
     
     if len(X) < 20: 
         test_size = 0.1 
-    # Para estratificar, cada clase debe tener al menos n_splits (por defecto 5 para CV, pero para train_test_split es 1)
-    # Aquí, más importante, para que el reporte de clasificación sea útil, test set debe tener ambas clases.
-    stratify_option = y if min_class_count > 1 else None # Solo estratificar si ambas clases tienen más de 1 muestra
+
+    stratify_option = y if min_class_count > 1 else None
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42, stratify=stratify_option)
     
@@ -156,13 +148,11 @@ def train_model(X, y):
     if len(y_train.unique()) < 2:
         print("Advertencia: El conjunto de entrenamiento solo contiene una clase de resultado después de la división. El modelo no será útil.")
         return None
-    if X_test.empty : # Si el test set quedó vacío por pocos datos
+    if X_test.empty :
          print("Advertencia: El conjunto de prueba está vacío. No se puede evaluar el modelo de forma estándar.")
-         # Podríamos entrenar con todo y no evaluar, o evaluar sobre el de entrenamiento (no ideal)
-         # Por ahora, no entrenamos si no podemos evaluar de forma mínima.
+
          return None
 
-    # Ajustar min_samples_split y min_samples_leaf para datasets pequeños
     min_samples_split_val = max(2, int(len(X_train) * 0.05)) if len(X_train) >= 40 else 2
     min_samples_leaf_val = max(1, int(len(X_train) * 0.02)) if len(X_train) >= 50 else 1
 
@@ -180,7 +170,7 @@ def train_model(X, y):
     accuracy = accuracy_score(y_test, y_pred)
     print(f"\nPrecisión en el conjunto de prueba: {accuracy:.2f}")
     
-    if len(y_test.unique()) > 1: # Solo mostrar reporte si hay ambas clases en el test set
+    if len(y_test.unique()) > 1:
          print("Reporte de Clasificación en conjunto de prueba:")
          print(classification_report(y_test, y_pred, zero_division=0))
     else:

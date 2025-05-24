@@ -1,10 +1,9 @@
-# app/ai/recommender.py
 import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-import traceback # Para imprimir tracebacks completos en caso de error
+import traceback
 
 # --- Funciones de Análisis Basadas en Reglas (Nivel 1 y Estadístico Avanzado) ---
 
@@ -19,7 +18,7 @@ def analyze_overall_winrate_and_streaks(stats_list):
 
     short_losses_count = 0
     for match in stats_list[:min(3, total_games)]: 
-        if not match.get("win", False) and match.get("duration", 99) < 22: # Duración en minutos
+        if not match.get("win", False) and match.get("duration", 99) < 22:
             short_losses_count += 1
     
     if short_losses_count >= 2:
@@ -62,17 +61,17 @@ def analyze_champion_performance(stats_list):
             champ_performance[champ]["wins"] += 1
 
     for champ, data in champ_performance.items():
-        if data["games"] >= 5:  # Umbral de partidas con un campeón para este análisis
+        if data["games"] >= 5:
             avg_kda = sum(data["kda_ratios"]) / data["games"] if data["games"] > 0 else 0
             winrate = data["wins"] / data["games"] if data["games"] > 0 else 0
             roles_str = "/".join(list(data["roles"])) if data["roles"] else "varios roles"
             
-            if winrate < 0.35: # Umbral de winrate bajo
+            if winrate < 0.35:
                 recommendations.append(
                     f"[CRITICAL] Con {champ} (jugado como {roles_str}), tu winrate es del {winrate:.0%} en {data['games']} partidas. "
                     "Este resultado es muy bajo. Podrías necesitar más práctica o una estrategia diferente con este campeón."
                 )
-            elif avg_kda < 2.0 : # KDA consistentemente bajo (umbral ejemplo)
+            elif avg_kda < 2.0 :
                  recommendations.append(
                     f"[SUGGESTION] Tu KDA promedio de {avg_kda:.1f} con {champ} (jugado como {roles_str}) es consistentemente bajo. "
                     "Revisa tu posicionamiento y toma de decisiones para reducir muertes y aumentar tu impacto."
@@ -83,23 +82,23 @@ def analyze_farming_cs_per_min(stats_list):
     recommendations = []
     if not stats_list: return recommendations
 
-    role_cs_thresholds = { "TOP": 6.0, "MIDDLE": 6.5, "BOTTOM": 7.0 } # Umbrales de CS/min de ejemplo
+    role_cs_thresholds = { "TOP": 6.0, "MIDDLE": 6.5, "BOTTOM": 7.0 }
     role_stats = {}
 
     for match in stats_list:
         role = match.get("role")
-        if role in role_cs_thresholds: # Solo roles donde el CS es primario
+        if role in role_cs_thresholds:
             if role not in role_stats:
                 role_stats[role] = {"total_cs_per_min": 0, "games": 0}
             role_stats[role]["total_cs_per_min"] += match.get("cs_per_min", 0)
             role_stats[role]["games"] += 1
             
     for role, data in role_stats.items():
-        if data["games"] >= 5: # Mínimo de partidas en ese rol
+        if data["games"] >= 5:
             avg_cs_per_min = data["total_cs_per_min"] / data["games"] if data["games"] > 0 else 0
             threshold = role_cs_thresholds[role]
             
-            if avg_cs_per_min < threshold * 0.85: # Si está un 15% por debajo del objetivo
+            if avg_cs_per_min < threshold * 0.85:
                 recommendations.append(
                     f"[SUGGESTION] Tu CS/min promedio como {role} es de {avg_cs_per_min:.1f}. "
                     f"Un objetivo para mejorar podría ser alrededor de {threshold:.1f} CS/min. "
@@ -113,13 +112,12 @@ def analyze_kill_participation(stats_list):
 
     relevant_games_kp = []
     for match in stats_list:
-        # KP% es más relevante para roles que se espera que roten y participen en peleas.
         if match.get("role") in ["JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] and "kp_percentage" in match:
             relevant_games_kp.append(match["kp_percentage"])
     
-    if len(relevant_games_kp) >= 5: # Mínimo de partidas en roles relevantes
+    if len(relevant_games_kp) >= 5:
         avg_kp = sum(relevant_games_kp) / len(relevant_games_kp) if len(relevant_games_kp) > 0 else 0
-        if avg_kp < 45.0: # Umbral de KP% bajo
+        if avg_kp < 45.0:
             recommendations.append(
                 f"[SUGGESTION] Tu participación promedio en asesinatos (KP%) en roles de impacto es del {avg_kp:.0f}%. "
                 "Intenta estar más atento a las oportunidades de rotar y unirte a las peleas de equipo."
@@ -135,7 +133,7 @@ def analyze_vision_score(stats_list):
     support_vs_min_list = []
 
     for match in stats_list:
-        if match.get("duration", 0) > 15: # Partidas de duración razonable
+        if match.get("duration", 0) > 15:
             vs_min = match.get("vision_score_per_min", 0)
             sum_vs_per_min += vs_min
             game_count_for_vision += 1
@@ -144,15 +142,15 @@ def analyze_vision_score(stats_list):
 
     if game_count_for_vision >= 3:
         avg_vs_per_min_overall = sum_vs_per_min / game_count_for_vision if game_count_for_vision > 0 else 0
-        if avg_vs_per_min_overall < 0.75: # Umbral general de VS/min
+        if avg_vs_per_min_overall < 0.75:
             recommendations.append(
                 f"[SUGGESTION] Tu puntuación de visión promedio por minuto es de {avg_vs_per_min_overall:.2f}. "
                 "Mejorar tu control de visión puede tener un gran impacto en el resultado de las partidas."
             )
 
-    if len(support_vs_min_list) >= 3: # Mínimo de partidas como Soporte
+    if len(support_vs_min_list) >= 3:
         avg_vs_min_support = sum(support_vs_min_list) / len(support_vs_min_list) if len(support_vs_min_list) > 0 else 0
-        if avg_vs_min_support < 1.3: # Umbral de VS/min para Soportes
+        if avg_vs_min_support < 1.3:
             recommendations.append(
                 f"[CRITICAL] Como Soporte, tu puntuación de visión por minuto es de {avg_vs_min_support:.2f}. "
                 "Este es un área crítica para tu rol. Prioriza la compra de Guardianes de Control y usa tu baratija de forma proactiva."
@@ -307,7 +305,6 @@ def analyze_playstyle_with_clustering(stats_list, num_clusters=3, min_games_for_
     playstyle_insights = []
 
     if not stats_list or len(stats_list) < min_games_for_clustering:
-        # No añadir mensaje aquí, la plantilla lo maneja si la lista está vacía.
         return playstyle_insights
 
     features_for_clustering = [
@@ -413,7 +410,7 @@ def analyze_playstyle_with_clustering(stats_list, num_clusters=3, min_games_for_
                 else:
                     insight_line += " Un perfil de juego con métricas equilibradas."
             
-            if best_match_archetype_tip: # Añadir el consejo del arquetipo si existe
+            if best_match_archetype_tip:
                 insight_line += f" {best_match_archetype_tip}"
 
             playstyle_insights.append(insight_line)
@@ -429,7 +426,7 @@ def analyze_playstyle_with_clustering(stats_list, num_clusters=3, min_games_for_
     return playstyle_insights
 
 
-# --- Función Principal para Recomendaciones Basadas en Reglas (Nivel 1 y Estadístico Avanzado) ---
+# --- Función Principal para Recomendaciones Basadas en Reglas ---
 def rule_based_recommendations(stats_list):
     if not stats_list or len(stats_list) < 3 : 
         return ["Juega más partidas para que podamos analizar tu rendimiento y ofrecerte recomendaciones personalizadas."]

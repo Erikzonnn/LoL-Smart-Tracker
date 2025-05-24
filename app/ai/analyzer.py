@@ -45,7 +45,6 @@ QUEUE_ID_TO_GAME_MODE_NAME = {
     2000: "Tutorial 1",
     2010: "Tutorial 2",
     2020: "Tutorial 3"
-    # Si en el futuro identificas el ID de Brawl u otros modos, los puedes añadir aquí.
 }
 
 def extract_player_stats(match_data, target_puuid):
@@ -197,11 +196,11 @@ def extract_all_participant_stats_for_db(single_match_json_data):
     if not single_match_json_data or not isinstance(single_match_json_data, dict) or \
        "info" not in single_match_json_data or not isinstance(single_match_json_data["info"], dict) or \
        "participants" not in single_match_json_data["info"] or not isinstance(single_match_json_data["info"]["participants"], list):
-        return [] # Devuelve lista vacía si los datos son incorrectos
+        return []
 
     all_participant_stats_for_db = []
-    game_duration_seconds = single_match_json_data["info"].get("gameDuration", 1) # Evitar división por cero si es 0
-    game_duration_minutes_float = game_duration_seconds / 60.0 if game_duration_seconds > 0 else 1.0 # Evitar división por cero
+    game_duration_seconds = single_match_json_data["info"].get("gameDuration", 1)
+    game_duration_minutes_float = game_duration_seconds / 60.0 if game_duration_seconds > 0 else 1.0
 
 
     for p_data in single_match_json_data["info"]["participants"]:
@@ -229,14 +228,14 @@ def extract_all_participant_stats_for_db(single_match_json_data):
             "damage_per_min": round(p_data.get("totalDamageDealtToChampions", 0) / game_duration_minutes_float, 0) if game_duration_minutes_float > 0 else 0,
             "vision_score": p_data.get("visionScore", 0),
             "vision_score_per_min": round(p_data.get("visionScore", 0) / game_duration_minutes_float, 2) if game_duration_minutes_float > 0 else 0,
-            "kp_percentage": 0.0, # Calcular después si tenemos total de kills del equipo
+            "kp_percentage": 0.0,
             "role": p_data.get("teamPosition", "N/A"),
             "item_ids_str": ",".join([str(p_data.get(f"item{i}", 0)) for i in range(7)]),
             "spell1_key": SUMMONER_SPELLS.get(p_data.get("summoner1Id"), ""),
             "spell2_key": SUMMONER_SPELLS.get(p_data.get("summoner2Id"), ""),
         }
 
-        # Calcular KP% para este participante
+        # Calcular KP%
         total_team_kills_for_participant = 0
         teams_data = single_match_json_data["info"].get("teams", [])
         for team_obj in teams_data:
@@ -250,7 +249,7 @@ def extract_all_participant_stats_for_db(single_match_json_data):
         elif (kills + assists) > 0:
             participant_stats["kp_percentage"] = 100.0
         
-        # Runas (simplificado a nombres de archivo de estilo por ahora)
+        # Runas
         primary_icon = "UnknownRuneStyle.png"
         secondary_icon = "UnknownRuneStyle.png"
         perks = p_data.get("perks")

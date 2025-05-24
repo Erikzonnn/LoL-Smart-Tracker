@@ -1,4 +1,3 @@
-# app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for
 from app.riot_api import (
     get_summoner_info, 
@@ -6,28 +5,28 @@ from app.riot_api import (
     get_summoner_v4_details_by_puuid, 
     get_league_v4_entries_by_summoner_id 
 )
-# Asegúrate de importar la nueva función de analyzer
+
 from app.ai.analyzer import (
     extract_player_stats, 
     process_all_participants_for_display,
-    extract_all_participant_stats_for_db, # <--- NUEVA FUNCIÓN PARA BD
-    QUEUE_ID_TO_GAME_MODE_NAME # Importar el mapeo para usarlo aquí también
+    extract_all_participant_stats_for_db,
+    QUEUE_ID_TO_GAME_MODE_NAME
 )
 from app.ai.recommender import ( 
     rule_based_recommendations, 
     get_ml_recommendations,
     analyze_playstyle_with_clustering
 )
-from app.extensions import db # Importar la instancia de la BD
-from app.models import Partida, ParticipantePartida # Importar tus modelos de BD
+from app.extensions import db
+from app.models import Partida, ParticipantePartida
 
 import requests
 import os
 import joblib 
 import pandas as pd 
 import numpy as np 
-import traceback # Para imprimir tracebacks completos
-import json # Para cargar los top_champion_influencers
+import traceback
+import json
 
 routes = Blueprint("routes", __name__)
 
@@ -38,7 +37,7 @@ TOP_FEATURES_DATA_PATH = 'top_champion_influencers.json'
 
 composition_model = None
 composition_model_features_ordered = [] 
-top_champion_influencers = [] # Inicializar como lista vacía
+top_champion_influencers = []
 
 try:
     if os.path.exists(MODEL_COMPOSITION_PATH) and os.path.exists(FEATURES_COMPOSITION_PATH):
@@ -80,8 +79,8 @@ def get_ddragon_version():
         response.raise_for_status()
         DDRAGON_VERSION_CACHE = response.json()[0]
         return DDRAGON_VERSION_CACHE
-    except Exception: # Ser más específico con las excepciones si es necesario
-        DDRAGON_VERSION_CACHE = "14.9.1" # Considera actualizar este fallback periódicamente
+    except Exception:
+        DDRAGON_VERSION_CACHE = "14.9.1"
         return DDRAGON_VERSION_CACHE
 
 def get_team_composition_prediction_insight(team_participants_data, model, ordered_features):
@@ -132,14 +131,13 @@ def index():
 
 @routes.route("/summoner/<path:riot_id>")
 def summoner(riot_id):
-    # Definir un contexto base para pasar a la plantilla
     context_vars = {
         "summoner_name_display": riot_id,
         "version": get_ddragon_version(),
         "general_recommendations": [],
         "ml_decision_tree_insights": [],
         "playstyle_insights": [],
-        "top_champion_influencers": top_champion_influencers, # Carga global
+        "top_champion_influencers": top_champion_influencers,
         "api_warning": None,
         "stats": [],
         "profile_icon_id": None,
@@ -220,8 +218,6 @@ def summoner(riot_id):
                 all_participants_data_for_db = extract_all_participant_stats_for_db(single_match_json_data)
                 for p_stat in all_participants_data_for_db:
                     if not p_stat.get("participant_puuid"): continue
-                    # El constructor de ParticipantePartida debe coincidir con las claves de p_stat
-                    # o debes mapearlas explícitamente. Asumimos que coinciden.
                     participante = ParticipantePartida(match_id=match_id, **p_stat) 
                     db.session.add(participante)
                 try:
@@ -271,6 +267,5 @@ def summoner(riot_id):
     context_vars["playstyle_insights"] = analyze_playstyle_with_clustering(
         processed_matches_for_template, num_clusters=NUM_CLUSTERS_PLAYSTYLE, 
         min_games_for_clustering=MIN_GAMES_FOR_CLUSTERING_ML )
-    # top_champion_influencers ya está en context_vars desde el inicio
 
     return render_template("summoner.html", **context_vars)
