@@ -4,7 +4,7 @@ import os
 import time
 from .extensions import cache
 
-RIOT_API_KEY = ("RGAPI-91997357-91e3-4ced-a418-bc794a85ebc2") 
+RIOT_API_KEY = ("RGAPI-bda0657c-26d5-4ea6-862f-4a934eb40eac") 
 if not RIOT_API_KEY:
     raise ValueError("La variable de entorno RIOT_API_KEY no está configurada. Por favor, configúrala.")
 

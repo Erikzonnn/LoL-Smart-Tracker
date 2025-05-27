@@ -1,42 +1,42 @@
 [
     {
-        "feature": "Ashe",
-        "importance": 0.048634980608532816
-    },
-    {
-        "feature": "Karma",
-        "importance": 0.040688828590476234
-    },
-    {
-        "feature": "Corki",
-        "importance": 0.03789140028707828
-    },
-    {
-        "feature": "Ahri",
-        "importance": 0.03399790479006577
-    },
-    {
-        "feature": "Caitlyn",
-        "importance": 0.03240019039944106
-    },
-    {
-        "feature": "Tristana",
-        "importance": 0.028458971920904255
-    },
-    {
         "feature": "Jinx",
-        "importance": 0.027025302639066585
-    },
-    {
-        "feature": "Zed",
-        "importance": 0.02660288208546039
+        "importance": 0.045871179237994344
     },
     {
         "feature": "MissFortune",
-        "importance": 0.01990862281295497
+        "importance": 0.04028180663458883
     },
     {
-        "feature": "Darius",
-        "importance": 0.01871349906231212
+        "feature": "Shen",
+        "importance": 0.033728076150354995
+    },
+    {
+        "feature": "Viego",
+        "importance": 0.03165089784186523
+    },
+    {
+        "feature": "Corki",
+        "importance": 0.030427992244580773
+    },
+    {
+        "feature": "Karma",
+        "importance": 0.027608574505812677
+    },
+    {
+        "feature": "Ashe",
+        "importance": 0.027598230306130865
+    },
+    {
+        "feature": "Pyke",
+        "importance": 0.027197630513758887
+    },
+    {
+        "feature": "Taliyah",
+        "importance": 0.0249288708370964
+    },
+    {
+        "feature": "Nautilus",
+        "importance": 0.020804011973758463
     }
 ]
